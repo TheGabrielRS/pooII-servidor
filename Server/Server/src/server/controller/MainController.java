@@ -10,6 +10,8 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
+import server.model.Conexao;
+
 /**
  * FXML Controller class
  *
@@ -39,7 +41,10 @@ public class MainController {
     @FXML
     public void initialize() {
         // TODO
-        this.fileWatch();
+        if(this.startServer())
+            System.out.println("deu bom");
+        else
+            System.out.println("deu ruim");
     }    
     
     @FXML
@@ -106,5 +111,10 @@ public class MainController {
                 + "\n" + "Arquivos Adicionados: " + "0");
 
         alert.showAndWait();
+    }
+    
+    public boolean startServer(){
+        Conexao server = new Conexao();
+        return server.iniciaConexao();
     }
 }

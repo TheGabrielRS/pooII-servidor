@@ -10,7 +10,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
-import server.model.Conexao;
+import server.model.GerenciadorDeConexao;
 
 /**
  * FXML Controller class
@@ -41,10 +41,7 @@ public class MainController {
     @FXML
     public void initialize() {
         // TODO
-        if(this.startServer())
-            System.out.println("deu bom");
-        else
-            System.out.println("deu ruim");
+        this.startListen();
     }    
     
     @FXML
@@ -113,8 +110,10 @@ public class MainController {
         alert.showAndWait();
     }
     
-    public boolean startServer(){
-        Conexao server = new Conexao();
-        return server.iniciaConexao();
+    public void startListen(){
+        Thread serverListener = new Thread(new GerenciadorDeConexao());
+        serverListener.setDaemon(true);
+        serverListener.start();
+        serverListener = null;
     }
 }

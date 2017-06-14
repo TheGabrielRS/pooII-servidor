@@ -5,10 +5,14 @@
  */
 package server.controller;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import server.model.Conexao;
 
 import server.model.GerenciadorDeConexao;
 
@@ -34,6 +38,8 @@ public class MainController {
     String statusOne;
     String statusTwo;
     String statusThree; 
+    
+    GerenciadorDeConexao objGerenciadorDeConexao;
     
     /**
      * Initializes the controller class.
@@ -111,9 +117,42 @@ public class MainController {
     }
     
     public void startListen(){
-        Thread serverListener = new Thread(new GerenciadorDeConexao());
-        serverListener.setDaemon(true);
-        serverListener.start();
-        serverListener = null;
+        
+        this.objGerenciadorDeConexao = new GerenciadorDeConexao();
+        
+        this.objGerenciadorDeConexao.getNovoSocket().addListener(new ChangeListener<Boolean>(){
+            public void changed(final ObservableValue<? extends Boolean> observable,
+          final Boolean oldValue, final Boolean newValue){
+                if(newValue){
+                Conexao novaConexao = new Conexao(objGerenciadorDeConexao.getSocket());
+                
+                novaConexao.getMsg().addListener(new ChangeListener<String>(){
+                    public void changed(final ObservableValue<? extends String> observable,
+                    final String oldValue, final String newValue){
+                        ListView listaAfetada;
+                        switch(novaConexao.getPosicao()){
+                            case 1:
+                                listaAfetada = listOne;
+                                break;
+                            case 2:
+                                listaAfetada = listTwo;
+                                break;
+                            case 3:
+                                listaAfetada = listThree;
+                                break;
+                        }
+                        listaAfetada = novaConexao.converteLista();
+                    }
+                });
+                
+                objGerenciadorDeConexao.threadList(novaConexao);
+                }
+            }
+        });
+        
+        
+        Thread gerenciadorDeConexao = new Thread(this.objGerenciadorDeConexao);
+        gerenciadorDeConexao.setDaemon(true);
+        gerenciadorDeConexao.start();
     }
 }

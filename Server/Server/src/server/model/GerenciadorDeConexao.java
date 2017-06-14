@@ -7,8 +7,10 @@ package server.model;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.ListIterator;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  *
@@ -18,11 +20,14 @@ public class GerenciadorDeConexao implements Runnable{
     
     private ServerSocket serverSocket;
     private Socket socket;
-    private LinkedList<Thread> conexoes;
+//    private LinkedList<Thread> conexoes;
+    private ArrayList<Thread> conexoes;
+    private BooleanProperty novoSocket;
     
     public GerenciadorDeConexao() {
         this.startServer();
-        this.conexoes = new LinkedList<Thread>();
+        this.conexoes = new ArrayList<Thread>(3);
+        this.novoSocket = new SimpleBooleanProperty(false);
     }
     
     public void run(){
@@ -32,9 +37,10 @@ public class GerenciadorDeConexao implements Runnable{
                 while(true){
                     try{
                         this.socket = serverSocket.accept();
+                        if(socket != null)
+                            this.novoSocket.set(true);
                         System.out.println("Conexão recebida de: "+socket.getLocalAddress().getHostAddress());
-                        Conexao con = new Conexao(this.socket);
-                        new Thread(con).start();
+                        this.novoSocket.set(false);
 //                        if(!this.threadList(con)){//Adiciona uma nova Conexão na LinkedList
 //                            if(this.threadChecker()) //Caso não seja inserida é verificado o status de todas as Threads de conexão
 //                                this.threadList(con); //Caso alguma Thread tenha sido removida é repetida a tentativa de inserção
@@ -58,10 +64,13 @@ public class GerenciadorDeConexao implements Runnable{
         }
     }
     
-    private boolean threadList(Conexao novaConexao){
-        if(this.conexoes.size() < 2){
-            this.conexoes.addLast(new Thread(novaConexao));
-            this.conexoes.getLast().start();
+    public boolean threadList(Conexao novaConexao){
+        System.out.println("tamanho "+conexoes.size());
+        if(this.conexoes.size() < 3){
+            novaConexao.setPosicao((this.conexoes.size()+1));
+            System.out.println("A posição é: "+novaConexao.getPosicao());
+            conexoes.add(new Thread(novaConexao));
+            conexoes.get(conexoes.size()-1).start();
             return true;
         }
         else{
@@ -82,5 +91,12 @@ public class GerenciadorDeConexao implements Runnable{
         }
         return flag;
     }
-    
+
+    public BooleanProperty getNovoSocket() {
+        return novoSocket;
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
 }

@@ -36,7 +36,7 @@ public class Conexao implements Runnable{
             try{
                 BufferedReader bfReader = new BufferedReader(reader);
                 String str = bfReader.readLine();
-                System.out.println("Do cliente "+clientSocket.getLocalAddress().getHostAddress()+" : "+str);
+                System.out.println("Do cliente "+clientSocket.getLocalAddress().getHostAddress()+" : "+str+" Thread: "+Thread.currentThread().getId());
             }catch(IOException e){
                 System.out.println("Conexão encerrada "+ Thread.currentThread().getId());
                 flag = false;

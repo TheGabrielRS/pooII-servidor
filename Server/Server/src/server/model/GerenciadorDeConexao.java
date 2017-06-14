@@ -34,10 +34,11 @@ public class GerenciadorDeConexao implements Runnable{
                         this.socket = serverSocket.accept();
                         System.out.println("Conexão recebida de: "+socket.getLocalAddress().getHostAddress());
                         Conexao con = new Conexao(this.socket);
-                        if(!this.threadList(con)){//Adiciona uma nova Conexão na LinkedList
-                            if(this.threadChecker()) //Caso não seja inserida é verificado o status de todas as Threads de conexão
-                                this.threadList(con); //Caso alguma Thread tenha sido removida é repetida a tentativa de inserção
-                        }
+                        new Thread(con).start();
+//                        if(!this.threadList(con)){//Adiciona uma nova Conexão na LinkedList
+//                            if(this.threadChecker()) //Caso não seja inserida é verificado o status de todas as Threads de conexão
+//                                this.threadList(con); //Caso alguma Thread tenha sido removida é repetida a tentativa de inserção
+//                        }
                     }catch(Exception e){
                         System.out.println("Falha na execução:\n"+ e.getMessage());
                     }

@@ -12,6 +12,7 @@ import java.net.Socket;
 import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -28,11 +29,13 @@ public class Conexao implements Runnable{
     private InputStreamReader reader;
     private int posicao;
     private StringProperty msg;
+    private StringProperty fileWatcher;
     private ObservableList listaQueVem;
 
     public Conexao(Socket clientSocket) {
         this.clientSocket = clientSocket;
         this.msg = new SimpleStringProperty("");
+        this.fileWatcher = new SimpleStringProperty("");
         try{
             this.reader = new InputStreamReader(this.clientSocket.getInputStream());
         }catch(Exception e){
@@ -44,16 +47,20 @@ public class Conexao implements Runnable{
         boolean flag = true;
         System.out.println("Conexão aberta "+ Thread.currentThread().getId());
         while(flag){
-            try{
-                
+            try{ 
                 BufferedReader bfReader = new BufferedReader(reader);
                 msg.set(bfReader.readLine());
+//                String bfStr = bfReader.readLine();
+//                System.out.println("Buffer Str: "+bfStr);
                 if(msg.get() == null){
                     flag = false;
                 }
+                else if(msg.get().split(":")[0].equals("fileWatcher")){
+                    System.out.println("entrou");
+                    this.fileWatcher.set(msg.get());
+                }
                 else if(!msg.get().equals("c53255317bb11707d0f614696b3ce6f221d0e2f2")){
-                    this.converteLista();
-                    System.out.println("Do cliente "+clientSocket.getLocalAddress().getHostAddress()+" : "+msg.get()+" Thread: "+Thread.currentThread().getId());
+                    System.out.println("Do cliente "+clientSocket.getInetAddress().getHostAddress()+": "+msg.get()+" Thread: "+Thread.currentThread().getId());
                 }
                 else{
                     System.out.println("vai morrer");
@@ -79,14 +86,13 @@ public class Conexao implements Runnable{
         return msg;
     }
     
-    public ListView converteLista(){
-        System.out.println("converteu");
-        List<String> list = new ArrayList<String>();
-        list.add(Integer.toString(posicao));
-        ObservableList obsl = FXCollections.observableList(list);
-        return new ListView(obsl);
+    public String getIp(){
+        return clientSocket.getInetAddress().getHostAddress();
     }
-    
+
+    public StringProperty getFileWatcher() {
+        return fileWatcher;
+    }
     
     
 }

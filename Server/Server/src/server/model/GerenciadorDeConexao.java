@@ -39,7 +39,7 @@ public class GerenciadorDeConexao implements Runnable{
                         this.socket = serverSocket.accept();
                         if(socket != null)
                             this.novoSocket.set(true);
-                        System.out.println("Conexão recebida de: "+socket.getLocalAddress().getHostAddress());
+                        System.out.println("Conexão recebida de: "+socket.getInetAddress().getHostAddress());
                         this.novoSocket.set(false);
 //                        if(!this.threadList(con)){//Adiciona uma nova Conexão na LinkedList
 //                            if(this.threadChecker()) //Caso não seja inserida é verificado o status de todas as Threads de conexão

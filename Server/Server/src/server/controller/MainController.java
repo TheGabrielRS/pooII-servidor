@@ -5,6 +5,7 @@
  */
 package server.controller;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
@@ -105,13 +106,13 @@ public class MainController {
     *   informando quantos arquivos foram excluídos 
     *   e quantos foram adicionados.
     */
-    public void fileWatch(){
+    public void fileWatch(String adicionados, String removidos){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("UFCSPA - Programação Orientada a Objetos II");
         alert.setHeaderText("Alteração de Arquivos");
         alert.setContentText("Cliente: " + "id do cliente"
-                + "\n" + "Arquivos Removidos: "  + "0"
-                + "\n" + "Arquivos Adicionados: " + "0");
+                + "\n" + "Arquivos Removidos: "  + removidos
+                + "\n" + "Arquivos Adicionados: " + adicionados);
 
         alert.showAndWait();
     }
@@ -126,26 +127,72 @@ public class MainController {
                 if(newValue){
                 Conexao novaConexao = new Conexao(objGerenciadorDeConexao.getSocket());
                 
+                
+                
                 novaConexao.getMsg().addListener(new ChangeListener<String>(){
                     public void changed(final ObservableValue<? extends String> observable,
                     final String oldValue, final String newValue){
-                        ListView listaAfetada;
-                        switch(novaConexao.getPosicao()){
-                            case 1:
-                                listaAfetada = listOne;
-                                break;
-                            case 2:
-                                listaAfetada = listTwo;
-                                break;
-                            case 3:
-                                listaAfetada = listThree;
-                                break;
+                        if(!newValue.equals("") && !newValue.equals("c53255317bb11707d0f614696b3ce6f221d0e2f2") && !newValue.matches("fileWatcher:\\d:\\d")){
+                            ObservableList obsl;
+                            switch(novaConexao.getPosicao()){
+                                case 1:             
+                                    obsl = listOne.getItems();
+                                    Platform.runLater(()->{
+                                        obsl.add(newValue);
+                                        listOne.setItems(obsl);
+                                    });
+                                    break;
+                                case 2:
+                                    obsl = listTwo.getItems();
+                                    Platform.runLater(()->{ // isso é um lambda
+                                        obsl.add(newValue);
+                                        listTwo.setItems(obsl);
+                                    });
+                                    break;
+                                case 3:
+                                    obsl = listThree.getItems();
+                                    Platform.runLater(()->{
+                                       obsl.add(newValue);
+                                       listThree.setItems(obsl);
+                                    });
+                                    break;
+                            }
+                            novaConexao.getMsg().set("");
                         }
-                        listaAfetada = novaConexao.converteLista();
                     }
                 });
                 
+                novaConexao.getFileWatcher().addListener(new ChangeListener<String>(){
+                    public void changed(final ObservableValue<? extends String> observable,
+                    final String oldValue, final String newValue){
+                        System.out.println("File Watcher: "+newValue);
+                        if(newValue.equals("")){
+                            String fileChanges[] = newValue.split(":");
+                            Platform.runLater(()->{fileWatch(fileChanges[1], fileChanges[2]);});
+                            novaConexao.getFileWatcher().set("");
+                        }
+                    }
+                });
+                
+                
                 objGerenciadorDeConexao.threadList(novaConexao);
+                switch(novaConexao.getPosicao()){
+                        case 1:
+                            Platform.runLater(()->{
+                                ipOne.setText(novaConexao.getIp());
+                            });
+                            break;
+                        case 2:
+                            Platform.runLater(()->{
+                                ipTwo.setText(novaConexao.getIp());
+                            });
+                            break;
+                        case 3:
+                            Platform.runLater(()->{
+                                ipThree.setText(novaConexao.getIp());
+                            });
+                            break;
+                    }
                 }
             }
         });

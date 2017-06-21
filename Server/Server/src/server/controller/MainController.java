@@ -5,9 +5,12 @@
  */
 package server.controller;
 
+import java.util.Arrays;
+import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -135,24 +138,21 @@ public class MainController {
                         if(!newValue.equals("") && !newValue.equals("c53255317bb11707d0f614696b3ce6f221d0e2f2") && !newValue.matches("fileWatcher:\\d:\\d")){
                             ObservableList obsl;
                             switch(novaConexao.getPosicao()){
-                                case 1:             
-                                    obsl = listOne.getItems();
+                                case 1:
+                                    obsl = FXCollections.observableList(Arrays.asList(newValue.substring(1,newValue.length()-1).split(",")));
                                     Platform.runLater(()->{
-                                        obsl.add(newValue);
                                         listOne.setItems(obsl);
                                     });
                                     break;
                                 case 2:
-                                    obsl = listTwo.getItems();
+                                    obsl = FXCollections.observableList(Arrays.asList(newValue.substring(1,newValue.length()-1).split(",")));
                                     Platform.runLater(()->{ // isso é um lambda
-                                        obsl.add(newValue);
                                         listTwo.setItems(obsl);
                                     });
                                     break;
                                 case 3:
-                                    obsl = listThree.getItems();
+                                    obsl = FXCollections.observableList(Arrays.asList(newValue.substring(1,newValue.length()-1).split(",")));
                                     Platform.runLater(()->{
-                                       obsl.add(newValue);
                                        listThree.setItems(obsl);
                                     });
                                     break;

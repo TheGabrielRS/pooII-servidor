@@ -8,6 +8,7 @@ package server.model;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.ListIterator;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -78,18 +79,11 @@ public class GerenciadorDeConexao implements Runnable{
         }
     }
     
-    private boolean threadChecker(){
-        ListIterator<Thread> cons = this.conexoes.listIterator();
-        Thread conexao;
-        boolean flag = false;
-        while(cons.hasNext()){
-            conexao = cons.next();
-            if(conexao.isInterrupted()){
-                this.conexoes.remove(conexao);
-                flag = true;
-            }
+    private void threadChecker(){
+        for(Thread t : this.conexoes){
+            if(!t.isInterrupted())
+                this.conexoes.remove(t);
         }
-        return flag;
     }
 
     public BooleanProperty getNovoSocket() {

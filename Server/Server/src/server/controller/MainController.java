@@ -166,7 +166,7 @@ public class MainController {
                     public void changed(final ObservableValue<? extends String> observable,
                     final String oldValue, final String newValue){
                         System.out.println("File Watcher: "+newValue);
-                        if(newValue.equals("")){
+                        if(newValue.matches("fileWatcher:\\d:\\d")){
                             String fileChanges[] = newValue.split(":");
                             Platform.runLater(()->{fileWatch(fileChanges[1], fileChanges[2]);});
                             novaConexao.getFileWatcher().set("");

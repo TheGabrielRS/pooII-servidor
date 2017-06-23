@@ -16,6 +16,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import server.model.Conexao;
 
 import server.model.GerenciadorDeConexao;
@@ -130,8 +132,6 @@ public class MainController {
                 if(newValue){
                 Conexao novaConexao = new Conexao(objGerenciadorDeConexao.getSocket());
                 
-                
-                
                 novaConexao.getMsg().addListener(new ChangeListener<String>(){
                     public void changed(final ObservableValue<? extends String> observable,
                     final String oldValue, final String newValue){
@@ -174,22 +174,55 @@ public class MainController {
                     }
                 });
                 
+                novaConexao.getRemovido().addListener(new ChangeListener<Boolean>(){
+                    public void changed(final ObservableValue<? extends Boolean> observable,
+                    final Boolean oldValue, final Boolean newValue){
+                        if(novaConexao.getRemovido().get()){
+                            switch(novaConexao.getPosicao()){
+                                case 1 :
+                                    Platform.runLater(()->{
+                                        statusOne = "Desconectado";
+                                        ipOne.setTextFill(Color.RED);
+                                    });
+                                    break;
+                                case 2 :
+                                    Platform.runLater(()->{
+                                        statusTwo = "Desconectado";
+                                        ipTwo.setTextFill(Color.RED);
+                                    });
+                                    break;
+                                case 3 :
+                                    Platform.runLater(()->{
+                                        statusThree = "Desconectado";
+                                        ipThree.setTextFill(Color.RED);
+                                    });
+                                    break;
+                            }
+                            objGerenciadorDeConexao.liberaPosicao(novaConexao.getPosicao());
+                            objGerenciadorDeConexao.threadChecker();
+                        }
+                    }
+                });
                 
+                objGerenciadorDeConexao.threadChecker();
                 objGerenciadorDeConexao.threadList(novaConexao);
                 switch(novaConexao.getPosicao()){
                         case 1:
                             Platform.runLater(()->{
                                 ipOne.setText(novaConexao.getIp());
+                                ipOne.setTextFill(Color.GREEN);
                             });
                             break;
                         case 2:
                             Platform.runLater(()->{
                                 ipTwo.setText(novaConexao.getIp());
+                                ipTwo.setTextFill(Color.GREEN);
                             });
                             break;
                         case 3:
                             Platform.runLater(()->{
                                 ipThree.setText(novaConexao.getIp());
+                                ipThree.setTextFill(Color.GREEN);
                             });
                             break;
                     }

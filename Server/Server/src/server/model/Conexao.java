@@ -1,4 +1,4 @@
-/*
+    /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -13,6 +13,8 @@ import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -30,12 +32,13 @@ public class Conexao implements Runnable{
     private int posicao;
     private StringProperty msg;
     private StringProperty fileWatcher;
-    private ObservableList listaQueVem;
-
+    private BooleanProperty removido;
+    
     public Conexao(Socket clientSocket) {
         this.clientSocket = clientSocket;
         this.msg = new SimpleStringProperty("");
         this.fileWatcher = new SimpleStringProperty("");
+        this.removido = new SimpleBooleanProperty(false);
         try{
             this.reader = new InputStreamReader(this.clientSocket.getInputStream());
         }catch(Exception e){
@@ -44,16 +47,16 @@ public class Conexao implements Runnable{
     }
     
     public void run(){
-        boolean flag = true;
+//        boolean flag = true;
         System.out.println("Conexão aberta "+ Thread.currentThread().getId());
-        while(flag){
+        while(!this.removido.get()){
             try{ 
                 BufferedReader bfReader = new BufferedReader(reader);
                 msg.set(bfReader.readLine());
 //                String bfStr = bfReader.readLine();
 //                System.out.println("Buffer Str: "+bfStr);
                 if(msg.get() == null){
-                    flag = false;
+                    this.removido.set(true);
                 }
                 else if(msg.get().split(":")[0].equals("fileWatcher")){
                     System.out.println("entrou");
@@ -68,7 +71,7 @@ public class Conexao implements Runnable{
                 }
             }catch(IOException e){
                 System.out.println("Conexão encerrada "+ Thread.currentThread().getId());
-                flag = false;
+                this.removido.set(true);
                 Thread.currentThread().interrupt();
             }
         }
@@ -93,6 +96,16 @@ public class Conexao implements Runnable{
     public StringProperty getFileWatcher() {
         return fileWatcher;
     }
+
+    public BooleanProperty getRemovido() {
+        return removido;
+    }
+
+    public long getThreadId() {
+        return Thread.currentThread().getId();
+    }
+    
+    
     
     
 }

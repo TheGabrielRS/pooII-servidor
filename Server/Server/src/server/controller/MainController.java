@@ -6,7 +6,6 @@
 package server.controller;
 
 import java.util.Arrays;
-import java.util.List;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -17,16 +16,11 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import server.model.Conexao;
 
 import server.model.GerenciadorDeConexao;
 
-/**
- * FXML Controller class
- *
- * @author heliof
- */
+
 public class MainController {
     @FXML Label ipOne;
     @FXML Label ipTwo;
@@ -53,6 +47,7 @@ public class MainController {
     @FXML
     public void initialize() {
         // TODO
+        this.initializeScreen();
         this.startListen();
     }    
     
@@ -63,14 +58,16 @@ public class MainController {
         alert.setHeaderText("Aplicação servidor");
         alert.setContentText("Autores:" + 
                 "\n" + "Gabriel Ramos dos Santos" +
-                "\n" + "Hélio Francisco das Neves Silveira Jr.");
+                "\n" + "Hélio Francisco das Neves Silveira Jr." +
+                "\n" + 
+                "\n" + "https://github.com/TheGabrielRS/pooII-servidor");
 
         alert.showAndWait();    
     }
     
     @FXML
     public void onDetail(){
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);        
         alert.setTitle("UFCSPA - Programação Orientada a Objetos II");
         alert.setHeaderText("Detalhes de Conexão");
         alert.setContentText("Cliente 1: " + statusOne +
@@ -80,27 +77,16 @@ public class MainController {
         alert.showAndWait();    
     }
     
-    @FXML
-    public void onTest(){
-        this.reconnect();
-        
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("UFCSPA - Programação Orientada a Objetos II");
-        alert.setHeaderText("Testando de Conexão");
-        alert.setContentText("Cliente 1: " + statusOne +
-                "\n" + "Cliente 2: " + statusTwo +
-                "\n" + "Cliente 3: " + statusThree);
-
-        alert.showAndWait();    
-    }
-    
-    public void reconnect(){
-        /*
-        *   Fazer uma função de reconexão
-        */
-        statusOne = "Conectando";        
-        statusTwo = "Conectando";        
-        statusThree = "Conectando";   
+    public void initializeScreen(){
+        statusOne = "Desconectado";
+        ipOne.setText(statusOne);
+        ipOne.setTextFill(Color.RED);
+        statusTwo = "Desconectado";
+        ipTwo.setText(statusTwo);
+        ipTwo.setTextFill(Color.RED);
+        statusThree = "Desconectado";
+        ipThree.setText(statusThree);
+        ipThree.setTextFill(Color.RED); 
     }
     
     /*
@@ -111,11 +97,11 @@ public class MainController {
     *   informando quantos arquivos foram excluídos 
     *   e quantos foram adicionados.
     */
-    public void fileWatch(String adicionados, String removidos){
+    public void fileWatch(String adicionados, String removidos, int idCliente){
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle("UFCSPA - Programação Orientada a Objetos II");
         alert.setHeaderText("Alteração de Arquivos");
-        alert.setContentText("Cliente: " + "id do cliente"
+        alert.setContentText("Cliente " + idCliente 
                 + "\n" + "Arquivos Removidos: "  + removidos
                 + "\n" + "Arquivos Adicionados: " + adicionados);
 
@@ -168,7 +154,7 @@ public class MainController {
                         System.out.println("File Watcher: "+newValue);
                         if(newValue.matches("fileWatcher:\\d:\\d")){
                             String fileChanges[] = newValue.split(":");
-                            Platform.runLater(()->{fileWatch(fileChanges[1], fileChanges[2]);});
+                            Platform.runLater(()->{fileWatch(fileChanges[1], fileChanges[2], novaConexao.getPosicao());});
                             novaConexao.getFileWatcher().set("");
                         }
                     }
@@ -211,18 +197,21 @@ public class MainController {
                             Platform.runLater(()->{
                                 ipOne.setText(novaConexao.getIp());
                                 ipOne.setTextFill(Color.GREEN);
+                                statusOne = "Conectado";
                             });
                             break;
                         case 2:
                             Platform.runLater(()->{
                                 ipTwo.setText(novaConexao.getIp());
                                 ipTwo.setTextFill(Color.GREEN);
+                                statusTwo = "Conectado";
                             });
                             break;
                         case 3:
                             Platform.runLater(()->{
                                 ipThree.setText(novaConexao.getIp());
                                 ipThree.setTextFill(Color.GREEN);
+                                statusThree = "Conectado";
                             });
                             break;
                     }
